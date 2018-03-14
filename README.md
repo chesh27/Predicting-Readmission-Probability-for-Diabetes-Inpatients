@@ -35,7 +35,7 @@ knitr::opts_chunk$set(tidy=TRUE, fig.width=6,  fig.height=5,
 [image_9]: ./images/j.png
 [image_10]: ./images/k.png
 [image_11]: ./images/l.png
-[image_12]: ./images/m.png
+[image_12]: ./images/m.png 
 
 
 # I. Executive Summary 
