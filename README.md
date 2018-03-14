@@ -23,6 +23,20 @@ graphics: yes
 knitr::opts_chunk$set(tidy=TRUE, fig.width=6,  fig.height=5, 
                       fig.align='left', dev = 'pdf')
 ```
+[image_0]: ./images/a.png
+[image_1]: ./images/b.png
+[image_2]: ./images/c.png
+[image_3]: ./images/d.png
+[image_4]: ./images/e.png
+[image_5]: ./images/f.png
+[image_6]: ./images/g.png
+[image_7]: ./images/h.png
+[image_8]: ./images/i.png
+[image_9]: ./images/j.png
+[image_10]: ./images/k.png
+[image_11]: ./images/l.png
+[image_12]: ./images/m.png
+
 
 # I. Executive Summary 
 
@@ -231,6 +245,7 @@ Anova(fit_b.best)
 # summary(fit.best)
 # Anova(fit.best)
 ```
+![alt text][image_0]
 
 ### LASSO in classifications:
 
@@ -249,6 +264,10 @@ set.seed(123)
 fit_lasso_cv <- cv.glmnet(X.readmissions, Y.readmissions, alpha=1, family="binomial", nfolds = 10, type.measure = "deviance")
 plot(fit_lasso_cv)
 ```
+
+![alt text][image_1]
+
+![alt text][image_2]
 
 ```{r, include = FALSE}
 # i): lambda.min
@@ -303,11 +322,7 @@ Now that we have selected our final model of read ~ num_procedures + num_medicat
                                                     
 which was obtained through backward selection, we now need to come up with a reasonable classifier for our model. Based on a quick and somewhat arbitrary guess, it's estimated that it costs twice as much to mislabel a readmission than it does to mislabel a non-readmission. Based on this risk ratio, I will propose a specific classification rule to minimize the cost. Then: 
 
-$a_{10}/a_{01}=2$ --> $a_{01}/a_{10}=1/2$
-
-$P(Y=1|x) > \frac{a_{01}/a_{10}}{1+a_{01}/a_{10}} = \frac{1/2}{1+(1/2)}= 1/3$
-
-$logit > log(\frac{1/3}{1 - 1/3}) =  log(1/2)= -0.693$ gives us the Bayes rule! 
+![alt text][image_3] 
 
 Therefore the Bayes Rule Classification Threshold using this risk ratio would be 1/3. Using this threshold we get a weighted misclassification error (MCE) of 0.22. 
 
@@ -337,6 +352,9 @@ MCE.bayes.2[i,2]=(sum(2*(fit.best.pred.bayes.2[rtrain_clean$read == "1"] != "1")
 ggplot(MCE.bayes.2, aes(x = Threshold, y = MCE)) + geom_point() +
     labs(title = "Threshold vs. MCE", x = "Threshold", y = "MCE")
 ```
+
+![alt text][image_4]
+
 ### Evaluating my model using testing data
 
 Get the fitted prob's using the testing data:
@@ -345,6 +363,7 @@ fit.fitted.test <- predict(fit_b.best, rtest_clean, type="response") # fit1 prob
 fit.test.roc <- roc(rtest_clean$read,fit.fitted.test, plot=T )
 auc(fit.test.roc)
 ```
+![alt text][image_5]
 
 ## c. Conclusion 
 
@@ -352,9 +371,10 @@ The key variables of importance were found to be: num_procedures, num_medication
 
 # III.  Citation 
 Data obtained from: [Beata Strack, Jonathan P. DeShazo, Chris Gennings, Juan L. Olmo, Sebastian Ventura, Krzysztof J. Cios, and John N. Clore, “Impact of HbA1c Measurement on Hospital Readmission Rates: Analysis of 70,000 Clinical Database Patient Records,” BioMed Research International, vol. 2014, Article ID 781670, 11 pages, 2014.] (https://archive.ics.uci.edu/ml/datasets/Diabetes+130-US+hospitals+for+years+1999-2008) 
+
 # IV. Appendix
 
-Full dataset summary: 
+A summary of the full dataset can be found in the writeup.
 ```{r, echo = FALSE}
 #Loading Readmission Data 
 fulldata <- read.csv("/Users/che/Documents/STAT471/Data/diabetic.data.csv")
@@ -363,70 +383,45 @@ summary(fulldata)
 
 Here is a graphical summary of the 28 input variables and the response variable we retained in the working dataset `rdata_clean`. 
 
-```{r, echo = FALSE}
-# Plot distributions for all relevant variables
-p1 <- ggplot(rdata_clean, aes(x = race)) + geom_bar() + labs(title = "Race", x = "race", y = "Count") + theme(axis.text.x=element_text(angle=45,hjust=1,vjust=0.5))
-p2 <- ggplot(rdata_clean, aes(x = gender)) + geom_bar() + labs(title = "Gender", x = "gender", y = "Count") + theme(axis.text.x=element_text(angle=45,hjust=1,vjust=0.5))
-p3 <- ggplot(rdata_clean, aes(x = time_in_hospital)) + geom_histogram(binwidth = 1) + labs(title = "Time in Hospital", x = "Time in hospital (days)", y = "Count") +theme(axis.text.x=element_text(angle=45,hjust=1,vjust=0.5))
-p4 <- ggplot(rdata_clean, aes(x = num_lab_procedures)) + geom_histogram(binwidth = 1) + labs(title = "# of Lab Procedures", x = "Number of lab procedures", y = "Count") +theme(axis.text.x=element_text(angle=45,hjust=1,vjust=0.5))
-p5 <- ggplot(rdata_clean, aes(x = num_procedures)) + geom_histogram(binwidth = 1) + labs(title = "# of Procedures", x = "Number of procedures", y = "Count") +theme(axis.text.x=element_text(angle=45,hjust=1,vjust=0.5))
-p6 <- ggplot(rdata_clean, aes(x = num_medications)) + geom_histogram(binwidth = 1) + labs(title = "# of Medications", x = "Number of medications", y = "Count") +theme(axis.text.x=element_text(angle=45,hjust=1,vjust=0.5))
-p7 <- ggplot(rdata_clean, aes(x = number_outpatient)) + geom_histogram(binwidth = 1) + labs(title = "# of Outpatient Visits", x = "# of outpatient visits", y = "Count") +theme(axis.text.x=element_text(angle=45,hjust=1,vjust=0.5))
-p8 <- ggplot(rdata_clean, aes(x = number_emergency)) + geom_histogram(binwidth = 1) + labs(title = "# of Emergency Visits", x = "# of emergency visits", y = "Count") +theme(axis.text.x=element_text(angle=45,hjust=1,vjust=0.5))
-p9 <- ggplot(rdata_clean, aes(x = number_inpatient)) + geom_histogram(binwidth = 1) + labs(title = "# of Inpatient visits", x = "# of inpatient visits", y = "Count")+theme(axis.text.x=element_text(angle=45,hjust=1,vjust=0.5))
-p10 <- ggplot(rdata_clean, aes(x = number_diagnoses)) + geom_histogram(binwidth = 1) + labs(title = "# of Diagnoses", x = "Number of diagnoses", y = "Count")+theme(axis.text.x=element_text(angle=45,hjust=1,vjust=0.5))
-p11 <- ggplot(rdata_clean, aes(x = max_glu_serum)) + geom_bar() + labs(title = "Max Glucose Serum", x = "Max glucose serum", y = "Count")+theme(axis.text.x=element_text(angle=45,hjust=1,vjust=0.5))
-p12 <- ggplot(rdata_clean, aes(x = A1Cresult)) + geom_bar() + labs(title = "Distribution of A1C result", x = "AIC result", y = "Count")+theme(axis.text.x=element_text(angle=45,hjust=1,vjust=0.5))
-p13 <- ggplot(rdata_clean, aes(x = metformin)) + geom_bar() + labs(title = "Metformin", x = "Metformin", y = "Count")+theme(axis.text.x=element_text(angle=45,hjust=1,vjust=0.5))
-p14 <- ggplot(rdata_clean, aes(x = glimepiride)) + geom_bar() + labs(title = "Glimepiride", x = "Glimepiride", y = "Count") +theme(axis.text.x=element_text(angle=45,hjust=1,vjust=0.5))
-p15 <- ggplot(rdata_clean, aes(x = glipizide)) + geom_bar() + labs(title = "Glipizide", x = "Glipizide", y = "Count") +theme(axis.text.x=element_text(angle=45,hjust=1,vjust=0.5))
-p16 <- ggplot(rdata_clean, aes(x = glyburide)) + geom_bar() + labs(title = "Glyburide", x = "Glyburide", y = "Count")+theme(axis.text.x=element_text(angle=45,hjust=1,vjust=0.5))
-p17 <- ggplot(rdata_clean, aes(x = pioglitazone)) + geom_bar() + labs(title = "Pioglitazone", x = "Pioglitazone", y = "Count")+theme(axis.text.x=element_text(angle=45,hjust=1,vjust=0.5))
-p18 <- ggplot(rdata_clean, aes(x = rosiglitazone)) + geom_bar() + labs(title = "Rosiglitazone", x = "Rosiglitazone", y = "Count")+theme(axis.text.x=element_text(angle=45,hjust=1,vjust=0.5))
-p19 <- ggplot(rdata_clean, aes(x = insulin)) + geom_bar() + labs(title = "Insulin", x = "Insulin", y = "Count")+theme(axis.text.x=element_text(angle=45,hjust=1,vjust=0.5))
-p20 <- ggplot(rdata_clean, aes(x = change)) + geom_bar() + labs(title = "Change", x = "Change", y = "Count")+theme(axis.text.x=element_text(angle=45,hjust=1,vjust=0.5))
-p21 <- ggplot(rdata_clean, aes(x = diabetesMed)) + geom_bar() + labs(title = "DiabetesMed", x = "Diabetes Med", y = "Count")+theme(axis.text.x=element_text(angle=45,hjust=1,vjust=0.5))
-p22 <- ggplot(rdata_clean, aes(x = disch_disp_modified)) + geom_bar() + labs(title = "disch_disp_modified", x = "disch_disp_modified", y = "Count")+theme(axis.text.x=element_text(angle=45,hjust=1,vjust=0.5))
-p23 <- ggplot(rdata_clean, aes(x = adm_src_mod)) + geom_bar() + labs(title = "adm_src_mod", x = "adm_src_mod", y = "Count") +theme(axis.text.x=element_text(angle=45,hjust=1,vjust=0.5))
-p24 <- ggplot(rdata_clean, aes(x = adm_typ_mod)) + geom_bar() + labs(title = "adm_typ_mod", x = "adm_typ_mod", y = "Count")+theme(axis.text.x=element_text(angle=45,hjust=1,vjust=0.5))
-p25 <- ggplot(rdata_clean, aes(x = age_mod)) + geom_bar() + labs(title = "Age_mod", x = "age_mod", y = "Count")+theme(axis.text.x=element_text(angle=45,hjust=1,vjust=0.5))
-p26 <- ggplot(rdata_clean, aes(x = diag1_mod)) + geom_bar() + labs(title = "Distribution of diag1_mod", x = "diag1_mod", y = "Count")+theme(axis.text.x=element_text(angle=45,hjust=1,vjust=0.5))
-p27 <- ggplot(rdata_clean, aes(x = diag2_mod)) + geom_bar() + labs(title = "Distribution of diag2_mod", x = "diag2_mod", y = "Count")+theme(axis.text.x=element_text(angle=45,hjust=1,vjust=0.5))
-p28 <- ggplot(rdata_clean, aes(x = diag3_mod)) + geom_bar() + labs(title = "Distribution of diag3_mod", x = "diag3_mod", y = "Count")+theme(axis.text.x=element_text(angle=45,hjust=1,vjust=0.5))
-p29 <- ggplot(rdata_clean, aes(x = read)) + geom_bar() + labs(title = "Distribution of Readmissions", x = "Readmissions", y = "Count")+theme(axis.text.x=element_text(angle=45,hjust=1,vjust=0.5))
-```
 
 Distributions of Demographics 
 ```{r, echo = FALSE}
 grid.arrange(p1, p2, p25, ncol = 3) #demographics
 ```
+![alt text][image_6]
 
 Distributions of Admission Details
 ```{r, echo = FALSE}
 grid.arrange(p3, p4, p5, p6, p10, p26, p27, p28, ncol = 4) #admission details
 ```
+![alt text][image_7]
 
 Distributions of Medical History variables 
 ```{r, echo = FALSE}
 grid.arrange(p7, p8, p9, ncol = 3) #medical history
 ```
+![alt text][image_8]
 
 Distribution of Clinical Results variables 
 ```{r, echo = FALSE}
 grid.arrange(p12, p13, ncol = 2) #clinical results
 ```
+![alt text][image_9]
 
 Distribution of Medication details variables 
 ```{r, echo = FALSE}
 grid.arrange(p11, p14, p15, p16, p17, p18, p19, p20, p21, ncol = 3) #medication details
 ```
+![alt text][image_10]
 
 Distribution of admission/discharge details variables 
 ```{r, echo = FALSE}
 grid.arrange(p22, p23, p24, ncol = 3) #admission/discharge details
 ```
+![alt text][image_11]
 
 Distribution of response variable (readmissions)
 ```{r, echo = FALSE}
 grid.arrange(p29) #response variable (readmission)
 ```
+![alt text][image_12]
